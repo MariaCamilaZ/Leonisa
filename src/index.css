@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* Paleta tomada de leonisa.com: carbón #231f20, crema #f5ece3, golden beige / nude de su catálogo */
+@theme {
+  --color-carbon: #231f20;
+  --color-crema: #f5ece3;
+  --color-nude: #e8d5c4;
+  --color-beige: #c9a27e;
+  --color-cobre: #a8754f;
+  --color-gris: #7e7d7c;
+  --color-ok: #108474;
+  --color-warn: #d4a017;
+  --color-crit: #c0392b;
+  --font-serif: "Canela", "Cormorant Garamond", Georgia, serif;
+  --font-sans: "AG Next", Inter, system-ui, sans-serif;
+}
+
+body { background: #fbf7f3; color: var(--color-carbon); font-family: var(--font-sans); }
+
+@keyframes pulso { 0%,100% { box-shadow: 0 0 0 0 rgb(192 57 43 / .55) } 50% { box-shadow: 0 0 0 10px rgb(192 57 43 / 0) } }
+.alerta-pulso { animation: pulso 1.6s infinite; }
