@@ -1,5 +1,5 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
-import { Droplet, Search, Wrench, X } from 'lucide-react';
+import { Droplet, ImagePlus, Search, Wrench, X } from 'lucide-react';
 import { PARAMETROS, REFERENCIAS, cumple, evaluar, nivelPara, type Accion, type Afinidad, type Alerta, type EstadoAccion, type Rollo } from '../data';
 import { Card, Cumple, ESTADO_ACCION, Field, NivelBadge, btnPrimario, btnSecundario, fmt, inputCls } from '../ui';
 
@@ -108,6 +108,11 @@ export default function Consulta({ rollos, alertas, setAlertas, afinidades, onAf
             <Card title={<span className="flex items-center gap-2"><Droplet size={18} className="text-cobre" /> Última afinidad</span>}>
               {ultimaAfin ? (
                 <div className="space-y-2 text-sm">
+                  {ultimaAfin.foto && (
+                    <a href={ultimaAfin.foto} target="_blank" rel="noreferrer">
+                      <img src={ultimaAfin.foto} alt="Muestra de afinidad" className="mb-2 h-40 w-full rounded-xl object-cover" />
+                    </a>
+                  )}
                   <span className={`inline-block rounded-full px-3 py-1 text-xs font-bold text-white ${ultimaAfin.resultado === 'conforme' ? 'bg-ok' : 'bg-crit'}`}>
                     {ultimaAfin.resultado === 'conforme' ? 'Conforme' : 'No conforme'}
                   </span>
@@ -207,7 +212,7 @@ function Dato({ n, label }: { n: number; label: string }) {
 }
 
 function FormAfinidad({ referencia, onGuardar, historial }: { referencia: string; onGuardar: (a: Afinidad) => void; historial: Afinidad[] }) {
-  const [f, setF] = useState({ fecha: new Date().toLocaleDateString('en-CA'), telar: '54', rollo: '', color: '', resultado: 'conforme' as Afinidad['resultado'], observacion: '' });
+  const [f, setF] = useState({ fecha: new Date().toLocaleDateString('en-CA'), telar: '54', rollo: '', color: '', resultado: 'conforme' as Afinidad['resultado'], observacion: '', foto: '' });
   const listo = f.rollo && f.color;
   return (
     <Card title="Registrar muestra de afinidad">
@@ -225,12 +230,35 @@ function FormAfinidad({ referencia, onGuardar, historial }: { referencia: string
         </Field>
         <Field label="Condición observada"><input className={inputCls} value={f.observacion} onChange={(e) => setF({ ...f, observacion: e.target.value })} /></Field>
       </div>
+      {f.foto ? (
+        <div className="relative mt-3">
+          <img src={f.foto} alt="Vista previa de la muestra" className="h-40 w-full rounded-xl object-cover" />
+          <button onClick={() => setF({ ...f, foto: '' })} className="absolute right-2 top-2 rounded-full bg-carbon/80 p-1 text-white" aria-label="Quitar imagen">
+            <X size={16} />
+          </button>
+        </div>
+      ) : (
+        <label className="mt-3 flex cursor-pointer flex-col items-center gap-1 rounded-xl border-2 border-dashed border-nude bg-crema/30 py-5 text-sm text-gris hover:border-beige">
+          <ImagePlus size={22} className="text-cobre" />
+          <span className="font-medium text-carbon">Cargar imagen de la muestra</span>
+          <span className="text-xs">Foto desde el celular o archivo</span>
+          <input
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) setF({ ...f, foto: URL.createObjectURL(file) });
+            }}
+          />
+        </label>
+      )}
       <button
         className={`${btnPrimario} mt-4 w-full`}
         disabled={!listo}
         onClick={() => {
-          onGuardar({ id: `af-${Date.now()}`, referencia, fecha: f.fecha, telar: +f.telar, rollo: +f.rollo, color: f.color, resultado: f.resultado, observacion: f.observacion });
-          setF({ ...f, rollo: '', color: '', observacion: '' });
+          onGuardar({ id: `af-${Date.now()}`, referencia, fecha: f.fecha, telar: +f.telar, rollo: +f.rollo, color: f.color, resultado: f.resultado, observacion: f.observacion, foto: f.foto || undefined });
+          setF({ ...f, rollo: '', color: '', observacion: '', foto: '' });
         }}
       >
         <Droplet size={16} /> Guardar afinidad
@@ -238,8 +266,9 @@ function FormAfinidad({ referencia, onGuardar, historial }: { referencia: string
       <h3 className="mb-2 mt-5 text-sm font-semibold text-gris">Historial</h3>
       <ul className="divide-y divide-nude text-sm">
         {historial.map((a) => (
-          <li key={a.id} className="flex justify-between py-2">
-            <span>{a.fecha} · T{a.telar}/R{a.rollo} · {a.color}</span>
+          <li key={a.id} className="flex items-center gap-2 py-2">
+            {a.foto ? <img src={a.foto} alt="" className="h-8 w-8 rounded object-cover" /> : <span className="h-8 w-8 rounded bg-crema" />}
+            <span className="flex-1">{a.fecha} · T{a.telar}/R{a.rollo} · {a.color}</span>
             <span className={a.resultado === 'conforme' ? 'text-ok' : 'text-crit'}>{a.resultado === 'conforme' ? 'Conforme' : 'No conforme'}</span>
           </li>
         ))}

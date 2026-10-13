@@ -92,6 +92,7 @@ export type Afinidad = {
   color: string;
   resultado: 'conforme' | 'no-conforme';
   observacion: string;
+  foto?: string; // URL local de la imagen de la muestra tinturada (demo: no se sube a ningún servidor)
 };
 
 export function cumple(valor: number, r: Rango) {
